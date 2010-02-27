@@ -1,0 +1,9 @@
+*.idea
+*.iml
+*.DS_Store
+.gradle
+/ide
+/build
+/samples/quickstart/build/
+/samples/quickstart/.gwt-tmp
+/samples/quickstart/tomcat

@@ -1,0 +1,31 @@
+defaultTasks 'clean', 'build'
+
+apply id: 'groovy'
+
+group = 'com.markuskobler.gradle'
+artifactId = 'gwt-gradle-plugin'
+version = '0.1-SNAPSHOT'
+
+
+manifest.mainAttributes('Implementation-Title': "${project.name}",
+                        'Implementation-Version': project.version,
+                        'Built-By': System.properties['user.name'])
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile gradleApi()
+    groovy localGroovy()
+    testCompile "junit:junit:4.7"
+}
+
+task ide(type: Sync) {
+    into file('ide/lib')
+    from { configurations.testRuntime.files(DependencySpecs.type(Type.EXTERNAL)) }
+}
+
+task rebuild(dependsOn: [buildNeeded])
+task releaseSnapshot(dependsOn: [clean, rebuild])
+// TODO upload to code.google.com/p/gradle-gwt-plugin

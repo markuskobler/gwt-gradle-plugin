@@ -1,0 +1,26 @@
+defaultTasks "clean", "build"
+
+buildscript {
+    repositories { flatDir(dirs: "../../build/libs/") }
+    dependencies { classpath 'com.markuskobler.gradle:gwt-gradle-plugin:0.1-SNAPSHOT' }
+}
+
+apply id: 'war'
+apply id: 'jetty'
+apply id: 'gwt2'
+
+group = 'quickstart'
+version = '0.1-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    providedCompile 'javax.servlet:servlet-api:2.5'
+    testCompile     'junit:junit:4.7'
+}
+
+gwtVersion = '2.0.1'
+gwtModule = 'sample.QuickStart'
+gwtStartupUrl = 'sample.QuickStart/index.html'
