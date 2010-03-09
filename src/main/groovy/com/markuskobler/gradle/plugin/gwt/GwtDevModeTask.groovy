@@ -24,8 +24,7 @@ import org.gradle.api.tasks.StopActionException
  *
  * @author Markus Kobler
  */
-class GwtDevModeTask extends AbstractGwtTask {
-    
+class GwtDevModeTask extends AbstractGwtTask {    
 
     static final String DEVMODE_CLASSNAME = 'com.google.gwt.dev.DevMode'
 
@@ -37,19 +36,12 @@ class GwtDevModeTask extends AbstractGwtTask {
     Class/*<ServletContainerLauncher>*/ server
     int codeServerPort = 0;
 
+    File buildDir
     File warDir
     File webApp
 
     List<String> startupUrls
   
-    File getWarDir() {
-        warDir
-    }
-
-    File getWebApp() {
-        webApp
-    }  
-
     @TaskAction
     def executeDevMode() {
 
@@ -88,6 +80,11 @@ class GwtDevModeTask extends AbstractGwtTask {
               unzip.src = webApp;
               unzip.dest = warDir;
               AntUtil.execute(unzip);
+            } else {
+                project.copy {
+                    from buildDir
+                    into warDir
+                }                
             }
 
             arg(line: "-war ${warDir}")

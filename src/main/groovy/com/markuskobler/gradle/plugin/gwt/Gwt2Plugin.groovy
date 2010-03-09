@@ -15,22 +15,19 @@
  */
 package com.markuskobler.gradle.plugin.gwt
 
-import org.gradle.api.Project
-import org.gradle.api.tasks.SourceSet
 import org.gradle.api.Plugin
-import org.gradle.api.plugins.JavaPlugin
+import org.gradle.api.Project
 import org.gradle.api.artifacts.ConfigurationContainer
-import org.gradle.api.plugins.WarPlugin
-import org.gradle.api.tasks.bundling.War
-import org.gradle.api.execution.TaskExecutionGraph
-import org.gradle.api.Task
-import org.gradle.api.tasks.bundling.Jar
-import org.gradle.api.plugins.JavaPluginConvention
-import org.gradle.api.tasks.testing.Test
-import org.gradle.api.internal.artifacts.dependencies.DefaultDependencyArtifact
-import org.gradle.api.internal.artifacts.dependencies.DefaultExternalModuleDependency
-import org.gradle.api.artifacts.Dependency
 import org.gradle.api.artifacts.ExternalModuleDependency
+import org.gradle.api.execution.TaskExecutionGraph
+import org.gradle.api.internal.artifacts.dependencies.DefaultExternalModuleDependency
+import org.gradle.api.plugins.JavaPlugin
+import org.gradle.api.plugins.JavaPluginConvention
+import org.gradle.api.plugins.WarPlugin
+import org.gradle.api.tasks.SourceSet
+import org.gradle.api.tasks.bundling.Jar
+import org.gradle.api.tasks.bundling.War
+import org.gradle.api.tasks.testing.Test
 
 /**
  *
@@ -121,8 +118,8 @@ class Gwt2Plugin implements Plugin<Project> {
         }
 
         project.tasks.withType(GwtDevModeTask.class).allTasks {GwtDevModeTask task ->
-
             task.conventionMapping.startupUrls = { pluginConvention.gwtStartupUrls }
+            task.conventionMapping.buildDir = { pluginConvention.gwtBuildDir }
             task.conventionMapping.warDir = { pluginConvention.gwtWarDir }
             task.conventionMapping.webApp = {
                 War war = (War) project.getTasks().findByName(WarPlugin.WAR_TASK_NAME)
@@ -130,23 +127,7 @@ class Gwt2Plugin implements Plugin<Project> {
             }
         }
 
-        disableCompileGwtIfDevModeEnabled(project)
-
         return pluginConvention
-    }
-
-    private void disableCompileGwtIfDevModeEnabled(final Project project) {
-        project.getGradle().getTaskGraph().whenReady {TaskExecutionGraph taskGraph ->
-            def devModeEnabled = false
-            taskGraph.allTasks.each {Task task ->
-                if (task.getPath().endsWith(GWT_DEV_MODE_TASK_NAME) && task.enabled) { devModeEnabled = true }
-            }
-            if (devModeEnabled) {
-                taskGraph.allTasks.each {Task task ->
-                    if (task.getPath().endsWith(COMPILE_GWT_TASK_NAME)) { task.enabled = false }
-                }
-            }
-        }
     }
 
     private void configureJarTaskDefaults(final Project project, final Gwt2PluginConvention pluginConvention) {
@@ -190,14 +171,13 @@ class Gwt2Plugin implements Plugin<Project> {
 
     private void addGwtDevMode(final Project project) {
         GwtDevModeTask gwtDevMode = project.tasks.add(GWT_DEV_MODE_TASK_NAME, GwtDevModeTask.class)
-        // TODO needs some refinement
-        // if WAR task is part project then depend on war if not fall back to simply compiling Java
+        gwtDevMode.dependsOn(COMPILE_GWT_TASK_NAME)
+        gwtDevMode.description = "Run's GWT Developer Mode"
+
+        // Also depend on WAR plugin if included
         if (null != project.getTasks().findByName(WarPlugin.WAR_TASK_NAME)) {
             gwtDevMode.dependsOn(WarPlugin.WAR_TASK_NAME)
-        } else {
-            gwtDevMode.dependsOn(JavaPlugin.COMPILE_JAVA_TASK_NAME)
-        }
-        gwtDevMode.description = "Run's GWT Developer Mode"
+        }        
     }
 
 }
