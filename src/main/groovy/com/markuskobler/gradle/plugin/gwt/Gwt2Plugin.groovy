@@ -37,7 +37,10 @@ class Gwt2Plugin implements Plugin<Project> {
 
     public static final String COMPILE_GWT_TASK_NAME = "compileGwt"
     public static final String GWT_DEV_MODE_TASK_NAME = "gwtDevMode"
-    public static final String CLEAN_TASK_NAME = "clean"
+
+
+    public static final String GWT_WAR_TASK_NAME = "gwtWar"
+
 
     public static final String GWT_CONFIGURATION_NAME = "gwt"
 
@@ -102,6 +105,12 @@ class Gwt2Plugin implements Plugin<Project> {
         Gwt2PluginConvention pluginConvention = new Gwt2PluginConvention(project)
 
         project.tasks.withType(AbstractGwtTask.class).allTasks {AbstractGwtTask task ->
+            task.conventionMapping.modules = { pluginConvention.gwtModules }
+            task.conventionMapping.logLevel = { pluginConvention.gwtLogLevel }
+        }
+
+        project.tasks.withType(CompileGwtTask.class).allTasks {CompileGwtTask task ->
+            task.conventionMapping.buildDir = { pluginConvention.gwtBuildDir }
             task.conventionMapping.classpath = {
                 SourceSet mainSourceSet = project.convention.getPlugin(JavaPluginConvention.class).sourceSets.getByName(SourceSet.MAIN_SOURCE_SET_NAME)
                 project.files(mainSourceSet.resources.srcDirs,
@@ -109,21 +118,22 @@ class Gwt2Plugin implements Plugin<Project> {
                         mainSourceSet.classesDir,
                         project.configurations.getByName(GWT_CONFIGURATION_NAME));
             }
-            task.conventionMapping.modules = { pluginConvention.gwtModules }
-            task.conventionMapping.logLevel = { pluginConvention.gwtLogLevel }
-        }
-
-        project.tasks.withType(CompileGwtTask.class).allTasks {CompileGwtTask task ->
-            task.conventionMapping.buildDir = { pluginConvention.gwtBuildDir }
         }
 
         project.tasks.withType(GwtDevModeTask.class).allTasks {GwtDevModeTask task ->
             task.conventionMapping.startupUrls = { pluginConvention.gwtStartupUrls }
-            task.conventionMapping.buildDir = { pluginConvention.gwtBuildDir }
             task.conventionMapping.warDir = { pluginConvention.gwtWarDir }
             task.conventionMapping.webApp = {
-                War war = (War) project.getTasks().findByName(WarPlugin.WAR_TASK_NAME)
+                GwtWarTask war = (GwtWarTask) project.getTasks().findByName(GWT_WAR_TASK_NAME)
                 war != null ? war.getArchivePath() : null
+            }
+            task.conventionMapping.classpath = {
+                SourceSet mainSourceSet = project.convention.getPlugin(JavaPluginConvention.class).sourceSets.getByName(SourceSet.MAIN_SOURCE_SET_NAME)
+                project.files(mainSourceSet.resources.srcDirs,
+                        mainSourceSet.java.srcDirs,
+                        mainSourceSet.classesDir,
+                        project.configurations.getByName(GWT_CONFIGURATION_NAME),
+                        project.configurations.getByName(JavaPlugin.RUNTIME_CONFIGURATION_NAME));
             }
         }
 
@@ -139,10 +149,11 @@ class Gwt2Plugin implements Plugin<Project> {
     }
 
     private void configureWarTaskDefaults(final Project project, final Gwt2PluginConvention pluginConvention) {
-        project.tasks.withType(War.class).allTasks({War task ->
-            task.dependsOn(COMPILE_GWT_TASK_NAME);
-            task.from(project.fileTree(pluginConvention.gwtBuildDir));
-        });
+        War task = project.tasks.findByName(WarPlugin.WAR_TASK_NAME)
+        if( task != null ) {
+            task.dependsOn(COMPILE_GWT_TASK_NAME)
+            task.from(project.fileTree(pluginConvention.gwtBuildDir))
+        }
     }
 
     private void configureTestTaskDefaults(final Project project, final Gwt2PluginConvention pluginConvention) {
@@ -171,12 +182,15 @@ class Gwt2Plugin implements Plugin<Project> {
 
     private void addGwtDevMode(final Project project) {
         GwtDevModeTask gwtDevMode = project.tasks.add(GWT_DEV_MODE_TASK_NAME, GwtDevModeTask.class)
-        gwtDevMode.dependsOn(COMPILE_GWT_TASK_NAME)
+        gwtDevMode.dependsOn(JavaPlugin.COMPILE_JAVA_TASK_NAME)
         gwtDevMode.description = "Run's GWT Developer Mode"
 
-        // Also depend on WAR plugin if included
+        // Also depend on generated WAR plugin if included
         if (null != project.getTasks().findByName(WarPlugin.WAR_TASK_NAME)) {
-            gwtDevMode.dependsOn(WarPlugin.WAR_TASK_NAME)
+            GwtWarTask warTask = project.tasks.add(GWT_WAR_TASK_NAME, GwtWarTask.class)
+            warTask.setDescription "Ignore - only required GwtDevMode"
+            warTask.setDestinationDir project.file("build/gwt/cache.war")
+            gwtDevMode.dependsOn(GWT_WAR_TASK_NAME)
         }        
     }
 

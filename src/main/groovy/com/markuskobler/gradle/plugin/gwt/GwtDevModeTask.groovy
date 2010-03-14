@@ -16,9 +16,9 @@
 package com.markuskobler.gradle.plugin.gwt
 
 import org.apache.tools.ant.taskdefs.Expand
+import org.gradle.api.tasks.StopActionException
 import org.gradle.api.tasks.TaskAction
 import org.gradle.util.AntUtil
-import org.gradle.api.tasks.StopActionException
 
 /**
  *
@@ -36,7 +36,6 @@ class GwtDevModeTask extends AbstractGwtTask {
     Class/*<ServletContainerLauncher>*/ server
     int codeServerPort = 0;
 
-    File buildDir
     File warDir
     File webApp
 
@@ -74,17 +73,11 @@ class GwtDevModeTask extends AbstractGwtTask {
             }
 
             warDir.mkdirs()
-            // todo improve so does not have to extract the war file each time
             if( webApp != null && webApp.exists() ) {
               Expand unzip = new Expand();
               unzip.src = webApp;
               unzip.dest = warDir;
               AntUtil.execute(unzip);
-            } else {
-                project.copy {
-                    from buildDir
-                    into warDir
-                }                
             }
 
             arg(line: "-war ${warDir}")

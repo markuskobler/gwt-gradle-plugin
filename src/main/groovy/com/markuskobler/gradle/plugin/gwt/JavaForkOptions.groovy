@@ -18,7 +18,8 @@ package com.markuskobler.gradle.plugin.gwt
 import org.gradle.api.tasks.compile.AbstractOptions
 
 /**
- *
+ * TODO check that this is still similar to standard gradle approach
+ * 
  * @author Markus Kobler
  */
 class JavaForkOptions extends AbstractOptions {

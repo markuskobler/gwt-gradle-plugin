@@ -17,8 +17,8 @@ package com.markuskobler.gradle.plugin.gwt
 
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputDirectory
-import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.StopActionException
+import org.gradle.api.tasks.TaskAction
 
 /**
  *
