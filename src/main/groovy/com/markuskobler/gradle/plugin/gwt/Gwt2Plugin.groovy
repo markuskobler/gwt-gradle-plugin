@@ -51,7 +51,7 @@ class Gwt2Plugin implements Plugin<Project> {
         configureConfigurations(project)
 
         Gwt2PluginConvention pluginConvention = configureConventions(project)
-        project.convention.plugins.gwt = pluginConvention
+        project.convention.plugins.gwt2 = pluginConvention
         
         configureGwtDependenciesIfVersionSpecified(project, pluginConvention)
         
