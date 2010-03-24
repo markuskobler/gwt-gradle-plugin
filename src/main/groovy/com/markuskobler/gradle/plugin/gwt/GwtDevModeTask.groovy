@@ -35,6 +35,7 @@ class GwtDevModeTask extends AbstractGwtTask {
     File logDir;
     Class/*<ServletContainerLauncher>*/ server
     int codeServerPort = 0;
+    String bindAddress;
 
     File warDir
     File webApp
@@ -63,6 +64,7 @@ class GwtDevModeTask extends AbstractGwtTask {
 
             if ( port > 0) arg(line: "-port ${port}")
             if ( codeServerPort > 0) arg(line: "-codeServerPort ${codeServerPort}")
+            if ( bindAddress ) arg(line: "-bindAddress ${bindAddress}")
 
             if ( whitelist ) arg(line: "-whitelist ${whitelist}")
             if ( blacklist ) arg(line: "-blacklist ${blacklist}")
@@ -102,6 +104,7 @@ class GwtDevModeTask extends AbstractGwtTask {
                 extraDir.mkdirs()
                 arg(line: "-extra ${extraDir}")
             }
+
 
             modules.each {
                 logger.info("GWT Module {}", it)
