@@ -19,6 +19,7 @@ import org.gradle.api.file.FileCollection
 import org.gradle.api.internal.ConventionTask
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.gradle.api.AntBuilder
 
 /**
  *

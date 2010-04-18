@@ -41,17 +41,16 @@ class Gwt2Plugin implements Plugin<Project> {
 
     public static final String GWT_WAR_TASK_NAME = "gwtWar"
 
-
     public static final String GWT_CONFIGURATION_NAME = "gwt"
 
-    void use(final Project project) {
+    void apply(Project project) {
 
-        project.getPlugins().usePlugin(JavaPlugin.class);
+        project.getPlugins().apply(JavaPlugin.class);
 
         configureConfigurations(project)
 
         Gwt2PluginConvention pluginConvention = configureConventions(project)
-        project.convention.plugins.gwt2 = pluginConvention
+        project.convention.plugins.gwt = pluginConvention
         
         configureGwtDependenciesIfVersionSpecified(project, pluginConvention)
         

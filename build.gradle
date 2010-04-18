@@ -1,31 +1,42 @@
 defaultTasks 'clean', 'build'
 
-apply id: 'groovy'
+apply plugin: 'groovy'
 
 group = 'com.markuskobler.gradle'
 artifactId = 'gwt-gradle-plugin'
 version = '0.1-SNAPSHOT'
 
+repositories {
+    flatDir(dirs: "libs")
+    mavenRepo(urls: 'http://gradle.artifactoryonline.com/gradle/libs')
+}
 
 manifest.mainAttributes('Implementation-Title': "${project.name}",
                         'Implementation-Version': project.version,
                         'Built-By': System.properties['user.name'])
 
-repositories {
-    mavenCentral()
-}
+libraries = [
+        ant             : 'org.apache.ant:ant:1.8.0@jar',
+        ant_nodeps      : 'org.apache.ant:ant-nodeps:1.8.0@jar',
+        commons_cli     : 'commons-cli:commons-cli:1.2@jar',        
+        groovy          : 'org.codehaus.groovy:groovy-all:1.7.1@jar',
+        slf4j_api       : 'org.slf4j:slf4j-api:1.5.10@jar',
+        junit           : 'junit:junit:4.7',
+        spock           : 'org.spockframework:spock-core:0.4-groovy-1.7-SNAPSHOT',
+
+        gradle_core     : 'org.gradle:gradle-core:0.9-SNAPSHOT',
+        gradle_plugins  : 'org.gradle:gradle-plugins:0.9-SNAPSHOT',
+
+        gwt_dev         : 'com.google.gwt:gwt-dev:2.0.3',
+        gwt_user        : 'com.google.gwt:gwt-user:2.0.3',
+        gwt_server      : 'com.google.gwt:gwt-server:2.0.3'
+        
+    ]
 
 dependencies {
-    compile gradleApi()
-    groovy localGroovy()
-    testCompile "junit:junit:4.7"
-}
 
-task ide(type: Sync) {
-    into file('ide/lib')
-    from { configurations.testRuntime.files(DependencySpecs.type(Type.EXTERNAL)) }
-}
+    groovy libraries.groovy, libraries.commons_cli, libraries.ant, libraries.ant_nodeps
 
-task rebuild(dependsOn: [buildNeeded])
-task releaseSnapshot(dependsOn: [clean, rebuild])
-// TODO upload to code.google.com/p/gradle-gwt-plugin
+    compile libraries.slf4j_api, libraries.ant, libraries.gradle_core, libraries.gradle_plugins
+    
+}

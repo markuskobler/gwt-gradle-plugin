@@ -27,11 +27,13 @@ class Gwt2PluginConvention {
 
     String gwtVersion
 
-    String gwtBuildDirName = "build/gwt/out"
-    String gwtWarDirName   = "build/gwt/war"
     String gwtLogLevel
     List<String> gwtModules
     List<String> gwtStartupUrls
+
+    // XXX remove from convention...
+    String gwtBuildDirName = "build/gwt/out"
+    String gwtWarDirName   = "build/gwt/war"
 
     Gwt2PluginConvention(project) {
         this.project = project
