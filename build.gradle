@@ -34,9 +34,8 @@ libraries = [
     ]
 
 dependencies {
-
-    groovy libraries.groovy, libraries.commons_cli, libraries.ant, libraries.ant_nodeps
-
-    compile libraries.slf4j_api, libraries.ant, libraries.gradle_core, libraries.gradle_plugins
+  compile gradleApi()
+  groovy localGroovy(), libraries.commons_cli, libraries.ant, libraries.ant_nodeps
+  compile libraries.slf4j_api, libraries.ant
     
 }

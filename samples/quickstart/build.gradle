@@ -5,9 +5,9 @@ buildscript {
     dependencies { classpath 'com.markuskobler.gradle:gwt-gradle-plugin:0.1-SNAPSHOT' }
 }
 
-apply id: 'war'
-apply id: 'jetty'
-apply id: 'gwt2'
+apply plugin: 'war'
+apply plugin: 'jetty'
+apply plugin: com.markuskobler.gradle.plugin.gwt.Gwt2Plugin
 
 group = 'quickstart'
 version = '0.1-SNAPSHOT'
@@ -21,6 +21,6 @@ dependencies {
     testCompile     'junit:junit:4.7'
 }
 
-gwtVersion = '2.0.1'
+gwtVersion = '2.1.0'
 gwtModule = 'sample.QuickStart'
 gwtStartupUrl = 'sample.QuickStart/index.html'
