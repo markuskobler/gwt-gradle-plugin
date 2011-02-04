@@ -51,9 +51,9 @@ class Gwt2Plugin implements Plugin<Project> {
 
         Gwt2PluginConvention pluginConvention = configureConventions(project)
         project.convention.plugins.gwt = pluginConvention
-        
+
         configureGwtDependenciesIfVersionSpecified(project, pluginConvention)
-        
+
         configureJarTaskDefaults(project, pluginConvention)
         configureTestTaskDefaults(project, pluginConvention)
         configureWarTaskDefaults(project, pluginConvention)
@@ -73,11 +73,11 @@ class Gwt2Plugin implements Plugin<Project> {
 
     private void configureGwtDependenciesIfVersionSpecified(final Project project, final Gwt2PluginConvention convention) {
         project.getGradle().getTaskGraph().whenReady {TaskExecutionGraph taskGraph ->
-            
+
             if( convention.gwtVersion != null && convention.gwtVersion.trim().length() > 0) {
 
                 def version = convention.gwtVersion.trim()
-                
+
                 ExternalModuleDependency dependency = new DefaultExternalModuleDependency("com.google.gwt", "gwt-dev", version )
                 project.configurations.getByName(GWT_CONFIGURATION_NAME).addDependency(dependency)
 
@@ -88,14 +88,14 @@ class Gwt2Plugin implements Plugin<Project> {
                     dependency = new DefaultExternalModuleDependency("com.google.gwt", "gwt-servlet", version )
                     project.configurations.getByName(JavaPlugin.RUNTIME_CONFIGURATION_NAME).addDependency(dependency)
                 } else {
-                    
+
                     dependency = new DefaultExternalModuleDependency("com.google.gwt", "gwt-user", version )
                     project.configurations.getByName(JavaPlugin.COMPILE_CONFIGURATION_NAME).addDependency(dependency)
-                    
+
                 }
 
             }
-        }        
+        }
     }
 
 
@@ -140,18 +140,16 @@ class Gwt2Plugin implements Plugin<Project> {
     }
 
     private void configureJarTaskDefaults(final Project project, final Gwt2PluginConvention pluginConvention) {
-        Jar jarTask = (Jar) project.getTasks().findByName(JavaPlugin.JAR_TASK_NAME)
-        if (jarTask != null) {
-            SourceSet mainSourceSet = project.convention.getPlugin(JavaPluginConvention.class).sourceSets.getByName(SourceSet.MAIN_SOURCE_SET_NAME);
-            jarTask.from(mainSourceSet.java.matching { include("**/client/**") });
+        project.tasks.withType(Jar.class).all {
+          SourceSet mainSourceSet = project.convention.getPlugin(JavaPluginConvention.class).sourceSets.getByName(SourceSet.MAIN_SOURCE_SET_NAME);
+          jarTask.from(mainSourceSet.java.matching { include("**/client/**") });
         }
     }
 
     private void configureWarTaskDefaults(final Project project, final Gwt2PluginConvention pluginConvention) {
-        War task = project.tasks.findByName(WarPlugin.WAR_TASK_NAME)
-        if( task != null ) {
-            task.dependsOn(COMPILE_GWT_TASK_NAME)
-            task.from(project.fileTree(pluginConvention.gwtBuildDir))
+        project.tasks.withType(War.class).all {
+          task.dependsOn(COMPILE_GWT_TASK_NAME)
+          task.from(project.fileTree(pluginConvention.gwtBuildDir))
         }
     }
 
@@ -190,7 +188,7 @@ class Gwt2Plugin implements Plugin<Project> {
             warTask.setDescription "Ignore - only required GwtDevMode"
             warTask.setDestinationDir project.file("build/gwt/cache.war")
             gwtDevMode.dependsOn(GWT_WAR_TASK_NAME)
-        }        
+        }
     }
 
 }
