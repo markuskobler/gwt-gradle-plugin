@@ -103,12 +103,12 @@ class Gwt2Plugin implements Plugin<Project> {
 
         Gwt2PluginConvention pluginConvention = new Gwt2PluginConvention(project)
 
-        project.tasks.withType(AbstractGwtTask.class).allTasks {AbstractGwtTask task ->
+        project.tasks.withType(AbstractGwtTask.class).all {AbstractGwtTask task ->
             task.conventionMapping.modules = { pluginConvention.gwtModules }
             task.conventionMapping.logLevel = { pluginConvention.gwtLogLevel }
         }
 
-        project.tasks.withType(CompileGwtTask.class).allTasks {CompileGwtTask task ->
+        project.tasks.withType(CompileGwtTask.class).all {CompileGwtTask task ->
             task.conventionMapping.buildDir = { pluginConvention.gwtBuildDir }
             task.conventionMapping.classpath = {
                 SourceSet mainSourceSet = project.convention.getPlugin(JavaPluginConvention.class).sourceSets.getByName(SourceSet.MAIN_SOURCE_SET_NAME)
@@ -119,7 +119,7 @@ class Gwt2Plugin implements Plugin<Project> {
             }
         }
 
-        project.tasks.withType(GwtDevModeTask.class).allTasks {GwtDevModeTask task ->
+        project.tasks.withType(GwtDevModeTask.class).all {GwtDevModeTask task ->
             task.conventionMapping.startupUrls = { pluginConvention.gwtStartupUrls }
             task.conventionMapping.warDir = { pluginConvention.gwtWarDir }
             task.conventionMapping.webApp = {
@@ -156,7 +156,7 @@ class Gwt2Plugin implements Plugin<Project> {
     }
 
     private void configureTestTaskDefaults(final Project project, final Gwt2PluginConvention pluginConvention) {
-        project.tasks.withType(Test.class).allTasks {Test test ->
+        project.tasks.withType(Test.class).all {Test test ->
 
             test.conventionMapping.classpath = {
 
